@@ -19,11 +19,11 @@ services:
   dev-db:
     image: postgres:15
     ports:
-      - 5436:5432
+      - 5432:5432
     environment:
       POSTGRES_USER: temaadmin
       POSTGRES_PASSWORD: "123"
-      POSTGRES_DB: tema_v3
+      POSTGRES_DB: tema
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
@@ -32,11 +32,11 @@ services:
   test-db:
     image: postgres:15
     ports:
-      - 5437:5432
+      - 5433:5432
     environment:
       POSTGRES_USER: tematest
       POSTGRES_PASSWORD: "123"
-      POSTGRES_DB: tema_test_v3
+      POSTGRES_DB: tema_test
     volumes:
       - test-data:/var/lib/postgresql/data
     networks:

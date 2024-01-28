@@ -6,10 +6,36 @@ import (
 	"time"
 
 	"github.com/aravindmathradan/tema/internal/data"
+	"github.com/aravindmathradan/tema/internal/validator"
 )
 
 func (app *application) createProjectHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "create new project")
+	var input struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		UserID      int64  `json:"user_id"`
+	}
+
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	project := &data.Project{
+		Name:        input.Name,
+		Description: input.Description,
+		UserID:      input.UserID,
+	}
+
+	v := validator.New()
+
+	if data.ValidateProject(v, project); !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	fmt.Fprintf(w, "%+v\n", input)
 }
 
 func (app *application) viewProjectHandler(w http.ResponseWriter, r *http.Request) {
