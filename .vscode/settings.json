@@ -1,0 +1,14 @@
+{
+  "editor.tabSize": 4,
+  "editor.insertSpaces": false,
+  "typescript.tsdk": "frontend/node_modules/typescript/lib",
+  "[svelte]": {
+    "editor.insertSpaces": false,
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  },
+  "[typescript]": {
+    "editor.insertSpaces": false
+  },
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true
+}
