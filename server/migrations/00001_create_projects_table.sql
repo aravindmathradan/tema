@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS projects (
 	created_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
 	updated_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
 	name text NOT NULL,
-	description text NOT NULL
+	description text NOT NULL,
+	version integer NOT NULL DEFAULT 1
 );
 -- +goose StatementEnd
 
