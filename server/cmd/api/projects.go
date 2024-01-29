@@ -9,6 +9,40 @@ import (
 	"github.com/aravindmathradan/tema/internal/validator"
 )
 
+func (app *application) listProjectsHandler(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		Name string
+		data.Filters
+	}
+
+	v := validator.New()
+	qs := r.URL.Query()
+
+	input.Name = app.readString(qs, "name", "")
+
+	input.Filters.Page = app.readInt(qs, "page", 1, v)
+	input.Filters.PageSize = app.readInt(qs, "page_size", 20, v)
+
+	input.Filters.Sort = app.readString(qs, "sort", "id")
+	input.Filters.SortSafelist = []string{"id", "name", "-id", "-name"}
+
+	if data.ValidateFilters(v, input.Filters); !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	projects, metadata, err := app.models.Projects.FindAll(input.Name, input.Filters)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"projects": projects, "metadata": metadata}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+}
+
 func (app *application) createProjectHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Name        string `json:"name"`
