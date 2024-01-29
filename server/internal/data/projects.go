@@ -30,7 +30,7 @@ type ProjectModel struct {
 	DB *sql.DB
 }
 
-func (m *ProjectModel) Find(id int64) (*Project, error) {
+func (m ProjectModel) Find(id int64) (*Project, error) {
 	if id < 1 {
 		return nil, ErrRecordNotFound
 	}
@@ -66,7 +66,7 @@ func (m *ProjectModel) Find(id int64) (*Project, error) {
 	return &project, nil
 }
 
-func (m *ProjectModel) FindAll(name string, filters Filters) ([]*Project, Metadata, error) {
+func (m ProjectModel) FindAll(name string, filters Filters) ([]*Project, Metadata, error) {
 	query := fmt.Sprintf(`
 		SELECT  count(*) OVER(), id, created_at, updated_at, name, description, version
 		FROM projects
@@ -118,7 +118,7 @@ func (m *ProjectModel) FindAll(name string, filters Filters) ([]*Project, Metada
 	return projects, metadata, nil
 }
 
-func (m *ProjectModel) Insert(project *Project) error {
+func (m ProjectModel) Insert(project *Project) error {
 	query := `
 		INSERT INTO projects (name, description)
 		VALUES ($1, $2)
@@ -132,7 +132,7 @@ func (m *ProjectModel) Insert(project *Project) error {
 	return m.DB.QueryRowContext(ctx, query, args...).Scan(&project.ID, &project.CreatedAt, &project.UpdatedAt, &project.Version)
 }
 
-func (m *ProjectModel) Update(project *Project) error {
+func (m ProjectModel) Update(project *Project) error {
 	query := `
         UPDATE projects 
         SET name = $1, description = $2, version = version + 1
@@ -163,7 +163,7 @@ func (m *ProjectModel) Update(project *Project) error {
 	return nil
 }
 
-func (m *ProjectModel) Delete(id int64) error {
+func (m ProjectModel) Delete(id int64) error {
 	if id < 1 {
 		return ErrRecordNotFound
 	}

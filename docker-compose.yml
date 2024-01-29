@@ -17,13 +17,11 @@ services:
   #   - "3000":"3000"
 
   dev-db:
-    image: postgres:15
+    build:
+      context: ./dockerfiles
+      dockerfile: devdb.dockerfile
     ports:
       - 5432:5432
-    environment:
-      POSTGRES_USER: temaadmin
-      POSTGRES_PASSWORD: "123"
-      POSTGRES_DB: tema
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
