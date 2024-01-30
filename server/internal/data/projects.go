@@ -135,14 +135,15 @@ func (m ProjectModel) Insert(project *Project) error {
 func (m ProjectModel) Update(project *Project) error {
 	query := `
         UPDATE projects 
-        SET name = $1, description = $2, version = version + 1
-        WHERE id = $3 AND version = $4
+        SET name = $1, description = $2, updated_at = $3, version = version + 1
+        WHERE id = $4 AND version = $5
 		RETURNING version`
 
 	// Create an args slice containing the values for the placeholder parameters.
 	args := []any{
 		project.Name,
 		project.Description,
+		time.Now(),
 		project.ID,
 		project.Version,
 	}
