@@ -9,7 +9,7 @@ import (
 	"github.com/aravindmathradan/tema/internal/validator"
 )
 
-func (app *application) signupUserHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Name     string `json:"name"`
 		Email    string `json:"email"`
