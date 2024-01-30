@@ -22,9 +22,9 @@ func (app *application) signupUserHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	user := &data.User{
-		Name:     input.Name,
-		Email:    input.Email,
-		IsActive: false,
+		Name:      input.Name,
+		Email:     input.Email,
+		Activated: false,
 	}
 
 	err = user.Password.Set(input.Password)
