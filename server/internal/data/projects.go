@@ -30,7 +30,7 @@ type ProjectModel struct {
 	DB *sql.DB
 }
 
-func (m ProjectModel) Find(id int64) (*Project, error) {
+func (m ProjectModel) Get(id int64) (*Project, error) {
 	if id < 1 {
 		return nil, ErrRecordNotFound
 	}
@@ -66,7 +66,7 @@ func (m ProjectModel) Find(id int64) (*Project, error) {
 	return &project, nil
 }
 
-func (m ProjectModel) FindAll(name string, filters Filters) ([]*Project, Metadata, error) {
+func (m ProjectModel) GetAll(name string, filters Filters) ([]*Project, Metadata, error) {
 	query := fmt.Sprintf(`
 		SELECT  count(*) OVER(), id, created_at, updated_at, name, description, version
 		FROM projects
