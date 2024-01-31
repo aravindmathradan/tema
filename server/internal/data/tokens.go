@@ -22,13 +22,17 @@ type Token struct {
 	UserID    int64     `json:"-"`
 	Expiry    time.Time `json:"expiry"`
 	Scope     string    `json:"-"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
 }
 
 func generateToken(userID int64, ttl time.Duration, scope string) (*Token, error) {
 	token := &Token{
-		UserID: userID,
-		Expiry: time.Now().Add(ttl),
-		Scope:  scope,
+		UserID:    userID,
+		Expiry:    time.Now().Add(ttl),
+		Scope:     scope,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	randomBytes := make([]byte, 16)
@@ -67,10 +71,10 @@ func (m TokenModel) New(userID int64, ttl time.Duration, scope string) (*Token, 
 
 func (m TokenModel) Insert(token *Token) error {
 	query := `
-		INSERT INTO tokens (hash, user_id, expiry, scope)
-		VALUES ($1, $2, $3, $4)`
+		INSERT INTO tokens (hash, user_id, expiry, scope, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6)`
 
-	args := []any{token.Hash, token.UserID, token.Expiry, token.Scope}
+	args := []any{token.Hash, token.UserID, token.Expiry, token.Scope, token.CreatedAt, token.UpdatedAt}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
