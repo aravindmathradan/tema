@@ -31,7 +31,7 @@ func (app *application) listProjectsHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	projects, metadata, err := app.models.Projects.GetAll(input.Name, input.Filters)
+	projects, metadata, err := app.models.Projects.FindAll(input.Name, input.Filters)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
@@ -89,7 +89,7 @@ func (app *application) viewProjectHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	project, err := app.models.Projects.Get(id)
+	project, err := app.models.Projects.Find(id)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrRecordNotFound):
@@ -113,7 +113,7 @@ func (app *application) updateProjectHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	project, err := app.models.Projects.Get(id)
+	project, err := app.models.Projects.Find(id)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrRecordNotFound):

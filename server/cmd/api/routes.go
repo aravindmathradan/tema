@@ -20,11 +20,12 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodPost, "/v1/tokens/authentication", app.createAuthenticationTokenHandler)
 
-	router.Handler(http.MethodGet, "/v1/projects", app.requirePermission("projects:read", http.HandlerFunc(app.listProjectsHandler)))
-	router.Handler(http.MethodPost, "/v1/projects", app.requirePermission("projects:write", http.HandlerFunc(app.createProjectHandler)))
-	router.Handler(http.MethodGet, "/v1/projects/:id", app.requirePermission("projects:read", http.HandlerFunc(app.viewProjectHandler)))
-	router.Handler(http.MethodPatch, "/v1/projects/:id", app.requirePermission("projects:write", http.HandlerFunc(app.updateProjectHandler)))
-	router.Handler(http.MethodDelete, "/v1/projects/:id", app.requirePermission("projects:write", http.HandlerFunc(app.deleteProjectHandler)))
+	protected := alice.New(app.requireActivatedUser)
+	router.Handler(http.MethodGet, "/v1/projects", protected.ThenFunc(app.listProjectsHandler))
+	router.Handler(http.MethodPost, "/v1/projects", protected.ThenFunc(app.createProjectHandler))
+	router.Handler(http.MethodGet, "/v1/projects/:id", protected.ThenFunc(app.viewProjectHandler))
+	router.Handler(http.MethodPatch, "/v1/projects/:id", protected.ThenFunc(app.updateProjectHandler))
+	router.Handler(http.MethodDelete, "/v1/projects/:id", protected.ThenFunc(app.deleteProjectHandler))
 
 	standard := alice.New(app.recoverPanic, app.rateLimit, app.authenticate)
 	return standard.Then(router)
