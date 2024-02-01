@@ -4,7 +4,7 @@
 </script>
 
 <div
-	class="h-screen border border-t-0 hidden md:flex md:flex-[0.6] px-3 md:px-2 py-2 space-y-4 flex-col sticky z-10"
+	class="border border-t-0 hidden md:flex md:flex-[0.6] px-3 md:px-2 py-2 space-y-4 flex-col sticky z-10"
 >
 	<div class="flex gap-[22px] h-fit p-2">
 		<Frame class="w-7 h-7" />

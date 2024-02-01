@@ -1,7 +1,5 @@
 <script lang="ts">
 	import {
-		ArrowRight,
-		CardStack,
 		CaretSort,
 		CaretUp,
 		Exit,
@@ -91,22 +89,21 @@
 </script>
 
 <div
-	class="px-3 md:flex-[0.15] h-screen md:px-2 border flex justify-between flex-col sticky z-10 top-0 left-0"
+	class="px-3 md:flex-[0.15] md:px-2 border flex justify-between flex-col sticky z-10 top-0 left-0"
 >
 	<div class="mt-3">
 		<Dialog.Root>
 			<Dialog.Trigger
-				class="flex gap-[22px] mb-3 p-3 w-full items-center bg-secondary rounded-md shadow-sm hover:bg-secondary/75"
+				class="flex gap-[22px] mb-3 p-3 w-full items-center bg-primary rounded-md shadow-sm hover:bg-primary/75"
 			>
-				<!-- <CardStack class="w-7 h-7 text-secondary-foreground" /> -->
 				{#if transcriptDropdownOpen}
-					<p class="md:inline-block text-lg font-medium text-secondary-foreground">Project 1</p>
+					<p class="md:inline-block text-lg font-medium text-primary-foreground">Project 1</p>
 				{:else}
-					<p class="hidden md:inline-block text-lg font-medium text-secondary-foreground">
+					<p class="hidden md:inline-block text-lg font-medium text-primary-foreground">
 						Project 1
 					</p>
 				{/if}
-				<Tokens class="ml-auto w-7 h-7 md:w-6 md:h-6" />
+				<Tokens class="ml-auto w-7 h-7 md:w-6 md:h-6 text-primary-foreground" />
 			</Dialog.Trigger>
 			<Dialog.Content class="gap-0">
 				<div class="text-xl font-medium mb-6">Select the project</div>
