@@ -6,24 +6,18 @@
 	export let form: SuperValidated<FormSchema>;
 </script>
 
-<Form.Root
-	method="POST"
-	{form}
-	schema={formSchema}
-	let:config
-	class="flex flex-col gap-3 w-2/5 max-w-96"
->
+<Form.Root method="POST" {form} schema={formSchema} let:config class="flex flex-col gap-3">
 	<Form.Field {config} name="email">
 		<Form.Item>
 			<Form.Label class="text-base">Email</Form.Label>
-			<Form.Input type="email" />
+			<Form.Input class="text-base" type="email" />
 			<Form.Validation />
 		</Form.Item>
 	</Form.Field>
 	<Form.Field {config} name="password">
 		<Form.Item>
 			<Form.Label class="text-base">Password</Form.Label>
-			<Form.Input type="password" />
+			<Form.Input class="text-base" type="password" />
 			<Form.Validation />
 		</Form.Item>
 	</Form.Field>

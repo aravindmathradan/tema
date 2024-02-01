@@ -4,10 +4,11 @@
 	export let data: PageData;
 </script>
 
-<div class="flex flex-col gap-[22px] items-center justify-center h-screen w-screen border">
-	<LoginForm form={data.form} />
-	<div>
-		Don't have an account?
-		<a href="/signup" class="text-accent">Sign up</a>
-	</div>
+<div class="mb-5 text-5xl text-left font-light">
+	Login to <span class="font-bold">Tema</span>
+</div>
+<LoginForm form={data.form} />
+<div>
+	Don't have an account?
+	<a href="/signup" class="text-accent font-medium">Sign up</a>
 </div>

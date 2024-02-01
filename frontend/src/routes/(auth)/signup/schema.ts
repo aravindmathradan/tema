@@ -3,7 +3,7 @@ import { z } from "zod";
 export const formSchema = z
 	.object({
 		name: z.string().min(1, "Required").max(100, "Name must contain at most 100 characters"),
-		email: z.string().min(1, "Required").email(),
+		email: z.string().email(),
 		password: z
 			.string()
 			.min(8, "password must contain at least 8 characters")

@@ -4,10 +4,13 @@
 	export let data: PageData;
 </script>
 
-<div class="flex flex-col gap-[22px] items-center justify-center h-screen w-screen border">
+<div class="mb-5 text-7xl lg:text-8xl text-left font-light flex-1">
+	Join <span class="md:block md:text-8xl lg:text-9xl font-bold">Tema</span>
+</div>
+<div class="flex flex-col flex-1 gap-5">
 	<SignupForm form={data.form} />
-	<div>
+	<div class="text-right">
 		Already have an account?
-		<a href="/login" class="text-accent">Login here</a>
+		<a href="/login" class="text-accent font-medium">Login</a>
 	</div>
 </div>
