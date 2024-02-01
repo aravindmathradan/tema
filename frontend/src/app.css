@@ -19,11 +19,11 @@
 		--border: 214.3 31.8% 91.4%;
 		--input: 214.3 21.8% 55.4%;
 
-		--primary: 222.2 47.4% 11.2%;
-		--primary-foreground: 210 40% 98%;
+		--primary: 339 47.4% 11.2%;
+		--primary-foreground: 339 35% 92%;
 
-		--secondary: 11 35% 92%;
-		--secondary-foreground: 222.2 47.4% 11.2%;
+		--secondary: 339 35% 92%;
+		--secondary-foreground: 339 47.4% 11.2%;
 
 		/* --secondary: 210 40% 90%; */
 		/* --secondary-foreground: 222.2 47.4% 11.2%; */
@@ -38,6 +38,9 @@
 		--destructive-foreground: 210 40% 98%;
 
 		--ring: 222.2 84% 4.9%;
+
+		--scrollbar-track: 339 35% 92%;
+		--scrollbar-thumb: 339 47.4% 11.2%;
 
 		--radius: 0.5rem;
 	}
@@ -74,6 +77,9 @@
 		--destructive-foreground: 210 40% 98%;
 
 		--ring: hsl(212.7, 26.8%, 83.9);
+
+		--scrollbar-track: 217.2 32.6% 17.5%;
+		--scrollbar-thumb: 210 40% 98%;
 	}
 }
 
@@ -94,16 +100,16 @@
 
 /* Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
-	width: 10px;
+	width: 8px;
 }
 
 *::-webkit-scrollbar-track {
-	background: #ffffff11;
+	background: #cccccc00;
 	border-radius: 5px;
 }
 
 *::-webkit-scrollbar-thumb {
-	background-color: #ffffff22;
+	background-color: #cccccc55;
 	border-radius: 14px;
 	border: 3px solid var(--primary);
 }

@@ -1,12 +1,19 @@
 <script lang="ts">
 	import {
+		CardStack,
+		CardStackPlus,
+		CaretDown,
 		CaretSort,
 		CaretUp,
+		ChevronRight,
+		Dash,
+		DoubleArrowRight,
 		Exit,
 		Frame,
 		Home,
 		MagnifyingGlass,
 		Person,
+		PlusCircled,
 		Reader,
 		Tokens,
 	} from "radix-icons-svelte";
@@ -36,7 +43,7 @@
 			contents: [],
 		},
 		{
-			icon: Reader,
+			icon: CardStack,
 			title: "transcripts",
 			href: "/",
 			contents: [
@@ -49,15 +56,43 @@
 					href: "/",
 				},
 				{
-					title: "Transcript 1",
+					title: "Transcript 3",
 					href: "/",
 				},
 				{
-					title: "Transcript 2",
+					title: "Transcript 4",
 					href: "/",
 				},
 				{
-					title: "Transcript 1",
+					title: "Transcript 5",
+					href: "/",
+				},
+				{
+					title: "Transcript 6",
+					href: "/",
+				},
+				{
+					title: "Transcript 7",
+					href: "/",
+				},
+				{
+					title: "Transcript 8",
+					href: "/",
+				},
+				{
+					title: "Transcript 9",
+					href: "/",
+				},
+				{
+					title: "Transcript 10",
+					href: "/",
+				},
+				{
+					title: "Transcript 11",
+					href: "/",
+				},
+				{
+					title: "Transcript 12",
 					href: "/",
 				},
 			],
@@ -91,10 +126,10 @@
 <div
 	class="px-3 md:flex-[0.15] md:px-2 border flex justify-between flex-col sticky z-10 top-0 left-0"
 >
-	<div class="mt-3">
+	<div class="flex flex-col flex-1 mt-3 min-h-0 overflow-y-auto">
 		<Dialog.Root>
 			<Dialog.Trigger
-				class="flex gap-[22px] mb-3 p-3 w-full items-center bg-primary rounded-md shadow-sm hover:bg-primary/75"
+				class="flex gap-[22px] mb-3 p-3 w-full items-center bg-primary hover:bg-primary/90 rounded-md shadow-sm hover:shadow-none shadow-primary/50 active:translate-y-[0.5px]  transition-colors duration-300 ease-out"
 			>
 				{#if transcriptDropdownOpen}
 					<p class="md:inline-block text-lg font-medium text-primary-foreground">Project 1</p>
@@ -107,16 +142,18 @@
 			</Dialog.Trigger>
 			<Dialog.Content class="gap-0">
 				<div class="text-xl font-medium mb-6">Select the project</div>
-				{#each projects as { title, href }, index}
+				{#each projects as { title, href }}
 					<a
 						{href}
-						class="flex gap-[22px] p-3 w-full items-center hover:bg-black/5 dark:hover:bg-white/10 border-b-2"
+						class="flex gap-[22px] p-3 w-full items-center hover:bg-secondary/55 border-b-2 transition-colors duration-300 ease-out"
 					>
 						<p class="text-lg capitalize ml-2">{title}</p>
 					</a>
 				{/each}
-				<Button class="mt-8 bg-accent p-5 hover:bg-accent/75">
-					<p class="text-lg font-medium text-accent-foreground">Create new project</p>
+				<Button
+					class="mt-8 bg-primary p-5 hover:bg-primary/90 shadow-sm hover:shadow-none shadow-primary/50 active:translate-y-[0.5px] transition-colors duration-300 ease-out"
+				>
+					<p class="text-lg font-medium text-primary-foreground">Create new project</p>
 				</Button>
 			</Dialog.Content>
 		</Dialog.Root>
@@ -125,26 +162,28 @@
 				<Collapsible.Root
 					onOpenChange={onTranscriptDropdownOpenChange}
 					bind:open={transcriptDropdownOpen}
+					class="flex flex-col min-h-0 mb-3"
 				>
 					<Collapsible.Trigger
-						class="flex gap-[22px] p-3 w-full items-center hover:bg-black/5 dark:hover:bg-white/10 rounded-md"
+						class="flex gap-[22px] p-3 w-full items-center justify-between hover:bg-secondary/55 rounded-md transition-colors duration-300 ease-out"
 					>
 						<svelte:component this={icon} class="w-7 h-7" />
 						{#if transcriptDropdownOpen}
-							<p class="text-lg capitalize md:inline-block pr-5">{title}</p>
+							<p class="text-lg capitalize md:inline-block">{title}</p>
 							<CaretUp class="hidden md:inline-block w-6 h-6 ml-auto" />
 						{:else}
-							<p class="text-lg capitalize hidden md:inline-block pr-5">{title}</p>
-							<CaretSort class="hidden md:inline-block w-6 h-6 ml-auto" />
+							<p class="text-lg capitalize hidden md:inline-block">{title}</p>
+							<CaretDown class="hidden md:inline-block w-6 h-6 ml-auto" />
 						{/if}
 					</Collapsible.Trigger>
-					<Collapsible.Content class="overflow-y-auto max-h-80">
+					<Collapsible.Content class="overflow-y-auto border-y-[1px]">
 						{#each contents as { title, href }}
 							<a
 								on:click={closeTranscriptDropdown}
 								{href}
-								class="flex gap-[22px] ml-12 p-2 w-fit items-center hover:bg-black/5 dark:hover:bg-white/10 rounded-md"
+								class="flex gap-[22px] p-2 w-full items-center hover:text-accent transition-colors duration-300 ease-out"
 							>
+								<Reader class="ml-12 w-4 h-4" />
 								<p class="text-base capitalize">{title}</p>
 							</a>
 						{/each}
@@ -153,7 +192,7 @@
 			{:else}
 				<a
 					{href}
-					class="flex gap-[22px] p-3 w-full items-center hover:bg-black/5 dark:hover:bg-white/10 rounded-md"
+					class="flex gap-[22px] p-3 w-full items-center hover:bg-secondary/55 rounded-md transition-colors duration-300 ease-out"
 				>
 					<svelte:component this={icon} class="w-7 h-7" />
 					{#if transcriptDropdownOpen}
@@ -167,7 +206,9 @@
 	</div>
 
 	<Popover.Root>
-		<Popover.Trigger class="mb-3 md:p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-md">
+		<Popover.Trigger
+			class="mb-3 md:p-2 hover:bg-secondary/55 rounded-md transition-colors duration-300 ease-out"
+		>
 			<div class="flex gap-2 items-center justify-center">
 				<Avatar.Root>
 					<Avatar.Image src="./favicon.png" alt="user" />
@@ -187,12 +228,18 @@
 			</div>
 		</Popover.Trigger>
 		<Popover.Content class="flex flex-col w-40 md:w-[280px] p-2">
-			<a href="/" class="flex gap-[22px] p-3 w-full items-center">
+			<a
+				href="/"
+				class="flex gap-[22px] p-3 w-full items-center hover:text-accent transition-colors duration-300 ease-out"
+			>
 				<Person class="w-5 h-5" />
 				<p>Account</p>
 			</a>
 			<span class="w-36 md:w-60 self-center border-b-2"></span>
-			<a href="/" class="flex gap-[22px] p-3 w-full items-center">
+			<a
+				href="/"
+				class="flex gap-[22px] p-3 w-full items-center hover:text-accent transition-colors duration-300 ease-out"
+			>
 				<Exit class="w-5 h-5" />
 				<p>Logout</p>
 			</a>
