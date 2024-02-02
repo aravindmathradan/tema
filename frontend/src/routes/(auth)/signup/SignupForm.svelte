@@ -1,12 +1,37 @@
 <script lang="ts">
+	import { toast } from "svelte-sonner";
 	import * as Form from "$lib/components/ui/form";
+	import type { FormOptions } from "formsnap";
 	import { formSchema, type FormSchema } from "./schema";
 	import type { SuperValidated } from "sveltekit-superforms";
 
 	export let form: SuperValidated<FormSchema>;
+
+	let formError: string;
+	const options: FormOptions<FormSchema> = {
+		onSubmit() {
+			// toast.info("Submitting...");
+		},
+		onResult({ result }) {
+			console.log(result);
+			formError = result.data?.form.message;
+			if (result.status === 200) toast.success("Account created successfully!");
+			if (result.status === 400) toast.error("Could not signup!");
+		},
+	};
 </script>
 
-<Form.Root method="POST" {form} schema={formSchema} let:config class="flex flex-col gap-3">
+{#if formError}
+	<span class="text-destructive">{formError}</span>
+{/if}
+<Form.Root
+	method="POST"
+	{form}
+	schema={formSchema}
+	{options}
+	let:config
+	class="flex flex-col gap-3"
+>
 	<Form.Field {config} name="name">
 		<Form.Item>
 			<Form.Label class="text-base">Name</Form.Label>

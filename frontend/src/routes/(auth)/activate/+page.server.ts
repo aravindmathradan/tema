@@ -1,12 +1,14 @@
 import type { PageServerLoad, Actions } from "./$types";
-import { fail, redirect, type NumericRange } from "@sveltejs/kit";
-import { message, setError, superValidate } from "sveltekit-superforms/server";
+import { fail, redirect } from "@sveltejs/kit";
+import { setError, superValidate } from "sveltekit-superforms/server";
 import { formSchema } from "./schema";
 import { BASE_API_URL } from "$env/static/private";
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async (event) => {
+	console.log(event.locals.signedupUser);
 	return {
 		form: await superValidate(formSchema),
+		user: event.locals.signedupUser,
 	};
 };
 
@@ -19,33 +21,23 @@ export const actions: Actions = {
 			});
 		}
 
-		const res = await fetch(`${BASE_API_URL}/users`, {
-			method: "POST",
+		const res = await fetch(`${BASE_API_URL}/users/activate`, {
+			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",
 			},
-			credentials: "include",
 			body: JSON.stringify({
-				name: form.data.name,
-				email: form.data.email,
-				password: form.data.password,
+				token: form.data.token,
 			}),
 		});
 
 		const response = await res.json();
 		if (!res.ok) {
-			if (typeof response.error === "string") {
-				return message(form, response.error, {
-					status: <NumericRange<400, 599>>res.status,
-				});
-			}
 			for (const field in response.error) {
 				return setError(form, field, response.error[field]);
 			}
 		}
 
-		event.locals.signedupUser = response.user;
-
-		throw redirect(303, "/activate");
+		throw redirect(303, "/login");
 	},
 };

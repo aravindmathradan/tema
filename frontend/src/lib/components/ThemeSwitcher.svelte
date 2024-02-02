@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { Switch } from "$lib/components/ui/switch";
 	import { Moon, Sun } from "radix-icons-svelte";
+	import { theme } from "$lib/stores/store";
 
-	let darkMode = false;
-	function themeToggled(checked: boolean) {
-		darkMode = !checked;
+	let darkMode = $theme === "dark";
+	function themeToggled() {
+		darkMode = !darkMode;
+		$theme = darkMode ? "dark" : "light";
 
 		darkMode
 			? document.documentElement.classList.add("dark")
