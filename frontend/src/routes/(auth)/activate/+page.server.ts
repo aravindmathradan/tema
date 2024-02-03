@@ -5,10 +5,11 @@ import { formSchema } from "./schema";
 import { BASE_API_URL } from "$env/static/private";
 
 export const load: PageServerLoad = async (event) => {
-	console.log(event.locals.signedupUser);
+	if (event.locals.user) {
+		throw redirect(302, "/app");
+	}
 	return {
 		form: await superValidate(formSchema),
-		user: event.locals.signedupUser,
 	};
 };
 

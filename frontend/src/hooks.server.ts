@@ -2,15 +2,11 @@ import { getAuthenticatedUser } from "$lib/server/auth";
 import { redirect, type Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
-	event.locals.user = getAuthenticatedUser(event);
+	event.locals.user = await getAuthenticatedUser(event);
 
-	if (event.locals.user) {
-		if (!event.url.pathname.startsWith("/app")) {
-			throw redirect(303, "/app");
-		}
-	} else {
+	if (!event.locals.user) {
 		if (event.url.pathname.startsWith("/app")) {
-			throw redirect(303, "/login");
+			throw redirect(302, "/login");
 		}
 	}
 
