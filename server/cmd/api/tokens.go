@@ -11,8 +11,10 @@ import (
 
 func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Email                 string `json:"email"`
+		Password              string `json:"password"`
+		Scope                 string `json:"scope"`
+		RefreshTokenPlainText string `json:"refresh_token"`
 	}
 
 	err := app.readJSON(w, r, &input)
@@ -23,45 +25,88 @@ func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, 
 
 	v := validator.New()
 
-	data.ValidateEmail(v, input.Email)
-	data.ValidatePasswordPlaintext(v, input.Password)
+	data.ValidateTokenScope(v, input.Scope)
 
 	if !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
 
-	user, err := app.models.Users.GetByEmail(input.Email)
-	if err != nil {
-		switch {
-		case errors.Is(err, data.ErrRecordNotFound):
+	if input.Scope == data.ScopeAuthentication {
+		data.ValidateEmail(v, input.Email)
+		data.ValidatePasswordPlaintext(v, input.Password)
+
+		if !v.Valid() {
+			app.failedValidationResponse(w, r, v.Errors)
+			return
+		}
+
+		user, err := app.models.Users.GetByEmail(input.Email)
+		if err != nil {
+			switch {
+			case errors.Is(err, data.ErrRecordNotFound):
+				app.invalidCredentialsResponse(w, r)
+			default:
+				app.serverErrorResponse(w, r, err)
+			}
+			return
+		}
+
+		match, err := user.Password.Matches(input.Password)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		if !match {
 			app.invalidCredentialsResponse(w, r)
-		default:
+			return
+		}
+
+		refreshToken, err := app.models.Tokens.New(user.ID, 30*24*time.Hour, data.ScopeRefresh)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		authToken, err := app.models.Tokens.New(user.ID, 24*time.Hour, data.ScopeAuthentication)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
+
+		err = app.writeJSON(w, http.StatusCreated, envelope{"authentication_token": authToken, "refresh_token": refreshToken}, nil)
+		if err != nil {
 			app.serverErrorResponse(w, r, err)
 		}
-		return
-	}
+	} else if input.Scope == data.ScopeRefresh {
+		if data.ValidateTokenPlaintext(v, input.RefreshTokenPlainText); !v.Valid() {
+			app.failedValidationResponse(w, r, v.Errors)
+			return
+		}
 
-	match, err := user.Password.Matches(input.Password)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
+		user, err := app.models.Users.GetForToken(data.ScopeRefresh, input.RefreshTokenPlainText)
+		if err != nil {
+			switch {
+			case errors.Is(err, data.ErrRecordNotFound):
+				v.AddError("refresh_token", "invalid or expired refresh token")
+				app.failedValidationResponse(w, r, v.Errors)
+			default:
+				app.serverErrorResponse(w, r, err)
+			}
+			return
+		}
 
-	if !match {
-		app.invalidCredentialsResponse(w, r)
-		return
-	}
+		authToken, err := app.models.Tokens.New(user.ID, 24*time.Hour, data.ScopeAuthentication)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+			return
+		}
 
-	token, err := app.models.Tokens.New(user.ID, 24*time.Hour, data.ScopeAuthentication)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
-
-	err = app.writeJSON(w, http.StatusCreated, envelope{"authentication_token": token}, nil)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
+		err = app.writeJSON(w, http.StatusCreated, envelope{"authentication_token": authToken}, nil)
+		if err != nil {
+			app.serverErrorResponse(w, r, err)
+		}
 	}
 }
 
@@ -190,5 +235,21 @@ func (app *application) createActivationTokenHandler(w http.ResponseWriter, r *h
 	err = app.writeJSON(w, http.StatusOK, env, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
+	}
+}
+
+func (app *application) deleteAuthenticationTokenHandler(w http.ResponseWriter, r *http.Request) {
+	user := app.contextGetUser(r)
+
+	err := app.models.Tokens.DeleteAllForUser(data.ScopeAuthentication, user.ID)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"message": "auth token deleted from database"}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/base32"
+	"fmt"
 	"time"
 
 	"github.com/aravindmathradan/tema/internal/validator"
@@ -15,6 +16,7 @@ const (
 	ScopeActivation     = "activation"
 	ScopeAuthentication = "authentication"
 	ScopePasswordReset  = "password-reset"
+	ScopeRefresh        = "refresh"
 )
 
 type Token struct {
@@ -54,6 +56,15 @@ func generateToken(userID int64, ttl time.Duration, scope string) (*Token, error
 func ValidateTokenPlaintext(v *validator.Validator, tokenPlaintext string) {
 	v.Check(validator.NotBlank(tokenPlaintext), "token", "must be provided")
 	v.Check(len(tokenPlaintext) == 26, "token", "must be 26 bytes long")
+}
+
+func ValidateTokenScope(v *validator.Validator, scope string) {
+	v.Check(validator.NotBlank(scope), "scope", "must be provided")
+	v.Check(
+		validator.PermittedValue[string](scope, ScopeAuthentication, ScopeRefresh),
+		"scope",
+		fmt.Sprintf("must be %s or %s", ScopeAuthentication, ScopeRefresh),
+	)
 }
 
 type TokenModel struct {
