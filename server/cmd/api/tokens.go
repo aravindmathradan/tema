@@ -247,6 +247,12 @@ func (app *application) deleteAuthenticationTokenHandler(w http.ResponseWriter, 
 		return
 	}
 
+	err = app.models.Tokens.DeleteAllForUser(data.ScopeRefresh, user.ID)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
 	err = app.writeJSON(w, http.StatusOK, envelope{"message": "auth token deleted from database"}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
