@@ -1,6 +1,7 @@
 package main
 
 import (
+	"expvar"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -31,6 +32,8 @@ func (app *application) routes() http.Handler {
 	router.Handler(http.MethodPatch, "/v1/projects/:id", app.requirePermission("projects:write", http.HandlerFunc(app.updateProjectHandler)))
 	router.Handler(http.MethodDelete, "/v1/projects/:id", app.requirePermission("projects:write", http.HandlerFunc(app.deleteProjectHandler)))
 
-	standard := alice.New(app.recoverPanic, app.enableCORS, app.rateLimit, app.authenticate)
+	router.Handler(http.MethodGet, "/debug/vars", expvar.Handler())
+
+	standard := alice.New(app.metrics, app.recoverPanic, app.enableCORS, app.rateLimit, app.authenticate)
 	return standard.Then(router)
 }
