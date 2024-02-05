@@ -14,7 +14,7 @@
 	}
 </script>
 
-<div class="flex gap-2 items-center">
+<div class="flex gap-2 items-center px-3">
 	<label for="theme-switch" class="mr-1">
 		{#if darkMode}
 			<Moon class="w-5 h-5" />

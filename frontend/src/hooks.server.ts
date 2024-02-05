@@ -6,7 +6,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	if (!event.locals.user) {
 		if (event.url.pathname.startsWith("/app")) {
-			throw redirect(302, "/login");
+			redirect(302, "/login");
 		}
 	}
 

@@ -3,28 +3,15 @@
 		CardStack,
 		CaretDown,
 		CaretUp,
-		Exit,
 		Frame,
 		Home,
 		MagnifyingGlass,
-		Person,
 		Reader,
 		Tokens,
 	} from "radix-icons-svelte";
-	import * as Avatar from "$lib/components/ui/avatar";
 	import * as Collapsible from "$lib/components/ui/collapsible";
-	import * as Popover from "$lib/components/ui/popover";
 	import * as Dialog from "$lib/components/ui/dialog";
 	import Button from "./ui/button/button.svelte";
-
-	export let userName: string | undefined;
-	export let userEmail: string | undefined;
-
-	const profilePictureFallbackLetters = userName
-		?.split(" ")
-		.reduce((out, curr) => out + curr.charAt(0), "")
-		.slice(0, 2)
-		.toUpperCase();
 
 	const sidebarOptions = [
 		{
@@ -127,12 +114,12 @@
 </script>
 
 <div
-	class="px-3 md:flex-[0.15] md:px-2 border flex justify-between flex-col sticky z-10 top-0 left-0"
+	class="px-3 md:flex-[0.22] md:px-2 border flex justify-between flex-col sticky z-10 top-0 left-0"
 >
 	<div class="flex flex-col flex-1 mt-3 min-h-0 overflow-y-auto">
 		<Dialog.Root>
 			<Dialog.Trigger
-				class="flex gap-[22px] mb-3 p-3 w-full items-center bg-primary hover:bg-primary/90 rounded-md shadow-sm hover:shadow-none shadow-primary/50 active:translate-y-[0.5px]  transition-colors duration-300 ease-out"
+				class="flex gap-[22px] mb-3 p-3 w-full items-center bg-primary hover:bg-primary/90 rounded-md shadow-sm hover:shadow-none shadow-primary/50 active:translate-y-[1px] active:translate-x-[1px] transition-all duration-300 ease-out"
 			>
 				{#if transcriptDropdownOpen}
 					<p class="md:inline-block text-lg font-medium text-primary-foreground">Project 1</p>
@@ -154,7 +141,7 @@
 					</a>
 				{/each}
 				<Button
-					class="mt-8 bg-primary p-5 hover:bg-primary/90 shadow-sm hover:shadow-none shadow-primary/50 active:translate-y-[0.5px] transition-colors duration-300 ease-out"
+					class="mt-8 bg-primary p-5 hover:bg-primary/90 shadow-sm hover:shadow-none shadow-primary/50 active:translate-y-[1px] active:translate-x-[1px] transition-all duration-300 ease-out"
 				>
 					<p class="text-lg font-medium text-primary-foreground">Create new project</p>
 				</Button>
@@ -168,7 +155,7 @@
 					class="flex flex-col min-h-0 mb-3"
 				>
 					<Collapsible.Trigger
-						class="flex gap-[22px] p-3 w-full items-center justify-between hover:bg-secondary/55 rounded-md transition-colors duration-300 ease-out"
+						class="flex gap-[22px] p-3 w-full items-center hover:bg-secondary/55 rounded-md transition-colors duration-300 ease-out"
 					>
 						<svelte:component this={icon} class="w-7 h-7" />
 						{#if transcriptDropdownOpen}
@@ -179,14 +166,14 @@
 							<CaretDown class="hidden md:inline-block w-6 h-6 ml-auto" />
 						{/if}
 					</Collapsible.Trigger>
-					<Collapsible.Content class="overflow-y-auto border-y-[1px]">
+					<Collapsible.Content class="overflow-y-auto bg-secondary/10 border-y rounded-md">
 						{#each contents as { title, href }}
 							<a
 								on:click={closeTranscriptDropdown}
 								{href}
-								class="flex gap-[22px] p-2 w-full items-center hover:text-accent transition-colors duration-300 ease-out"
+								class="flex gap-[22px] p-2 w-full items-center hover:text-accent hover:font-medium hover:border-y transition-colors duration-300 ease-out"
 							>
-								<Reader class="ml-12 w-4 h-4" />
+								<Reader class="ml-3 md:ml-8 w-4 h-4" />
 								<p class="text-base capitalize">{title}</p>
 							</a>
 						{/each}
@@ -207,47 +194,4 @@
 			{/if}
 		{/each}
 	</div>
-
-	<Popover.Root>
-		<Popover.Trigger
-			class="mb-3 md:p-2 hover:bg-secondary/55 rounded-md transition-colors duration-300 ease-out"
-		>
-			<div class="flex gap-2 items-center justify-center">
-				<Avatar.Root>
-					<!-- <Avatar.Image src="./favicon.png" alt="user" /> -->
-					<Avatar.Fallback>{profilePictureFallbackLetters}</Avatar.Fallback>
-				</Avatar.Root>
-				{#if transcriptDropdownOpen}
-					<div class="text-start md:inline-block hover:bg-white/19 rounded-md">
-						<p class="font-medium capitalize">{userName}</p>
-						<p class="text-gray-500">{userEmail}</p>
-					</div>
-				{:else}
-					<div class="text-start hidden md:inline-block hover:bg-white/19 rounded-md">
-						<p class="font-medium capitalize">{userName}</p>
-						<p class="text-gray-500">{userEmail}</p>
-					</div>
-				{/if}
-			</div>
-		</Popover.Trigger>
-		<Popover.Content class="flex flex-col w-40 md:w-[280px] p-2">
-			<a
-				href="/"
-				class="flex gap-[22px] p-3 w-full items-center hover:text-accent transition-colors duration-300 ease-out"
-			>
-				<Person class="w-5 h-5" />
-				<p>Account</p>
-			</a>
-			<span class="w-36 md:w-60 self-center border-b-2"></span>
-			<form action="/logout" method="POST">
-				<button
-					type="submit"
-					class="flex gap-[22px] p-3 w-full items-center hover:text-accent transition-colors duration-300 ease-out"
-				>
-					<Exit class="w-5 h-5" />
-					<p>Logout</p>
-				</button>
-			</form>
-		</Popover.Content>
-	</Popover.Root>
 </div>

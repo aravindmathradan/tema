@@ -4,9 +4,9 @@ import { message, setError, superValidate } from "sveltekit-superforms/server";
 import { formSchema } from "./schema";
 import { BASE_API_URL } from "$env/static/private";
 
-export const load: PageServerLoad = async (event) => {
-	if (event.locals.user) {
-		throw redirect(302, "/app");
+export const load: PageServerLoad = async ({ locals }) => {
+	if (locals.user) {
+		redirect(302, "/app");
 	}
 	return {
 		form: await superValidate(formSchema),
@@ -31,6 +31,7 @@ export const actions: Actions = {
 			body: JSON.stringify({
 				email: form.data.email,
 				password: form.data.password,
+				scope: "authentication",
 			}),
 		});
 
@@ -54,6 +55,14 @@ export const actions: Actions = {
 			maxAge: 60 * 60 * 24 * 7, // 1 week
 		});
 
-		throw redirect(303, "/app");
+		event.cookies.set("refresh-token", response.refresh_token.token, {
+			path: "/",
+			httpOnly: true,
+			sameSite: "strict",
+			secure: process.env.NODE_ENV === "production",
+			maxAge: 60 * 60 * 24 * 30, // 1 month
+		});
+
+		redirect(303, "/app");
 	},
 };

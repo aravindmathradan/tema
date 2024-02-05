@@ -4,9 +4,9 @@ import { setError, superValidate } from "sveltekit-superforms/server";
 import { formSchema } from "./schema";
 import { BASE_API_URL } from "$env/static/private";
 
-export const load: PageServerLoad = async (event) => {
-	if (event.locals.user) {
-		throw redirect(302, "/app");
+export const load: PageServerLoad = async ({ locals }) => {
+	if (locals.user) {
+		redirect(302, "/app");
 	}
 	return {
 		form: await superValidate(formSchema),
@@ -39,6 +39,6 @@ export const actions: Actions = {
 			}
 		}
 
-		throw redirect(303, "/login");
+		redirect(303, "/login");
 	},
 };

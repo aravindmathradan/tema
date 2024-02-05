@@ -13,7 +13,6 @@
 			// toast.info("Submitting...");
 		},
 		onResult({ result }) {
-			console.log(result);
 			formError = result.data?.form.message;
 			if (result.status === 200) toast.success("Welcome!");
 			if (result.status >= 400) toast.error("Could not login!");
