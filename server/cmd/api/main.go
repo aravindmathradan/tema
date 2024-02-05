@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"expvar"
 	"flag"
+	"fmt"
 	"log/slog"
 	"os"
 	"runtime"
@@ -14,10 +15,11 @@ import (
 
 	"github.com/aravindmathradan/tema/internal/data"
 	"github.com/aravindmathradan/tema/internal/mailer"
+	"github.com/aravindmathradan/tema/internal/vcs"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-const version = "1.0.0"
+var version = vcs.Version()
 
 type config struct {
 	port int
@@ -59,7 +61,7 @@ func main() {
 	flag.IntVar(&cfg.port, "port", 5000, "API server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development|staging|production)")
 
-	flag.StringVar(&cfg.db.dsn, "dsn", os.Getenv("TEMA_DB_DSN"), "DB connection string")
+	flag.StringVar(&cfg.db.dsn, "dsn", "", "DB connection string")
 
 	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "PostgreSQL max open connections")
 	flag.IntVar(&cfg.db.maxIdleConns, "db-max-idle-conns", 25, "PostgreSQL max idle connections")
@@ -80,7 +82,14 @@ func main() {
 		return nil
 	})
 
+	displayVersion := flag.Bool("version", false, "Display version and exit")
+
 	flag.Parse()
+
+	if *displayVersion {
+		fmt.Printf("Version:\t%s\n", version)
+		os.Exit(0)
+	}
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
