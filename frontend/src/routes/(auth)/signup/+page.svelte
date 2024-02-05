@@ -10,7 +10,7 @@
 <div class="flex flex-col flex-1 gap-5">
 	<SignupForm form={data.form} />
 	<div class="text-right">
-		Already have an account?
+		Have an account?
 		<a href="/login" class="text-accent font-medium">Login</a>
 	</div>
 </div>
