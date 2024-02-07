@@ -135,5 +135,5 @@ production/deploy/frontend:
 	@echo 'Deploying frontend application on production...'
 	rsync -rP --delete ./frontend/build/ tema@${production_host_ip}:~/frontend/
 	ssh -t tema@${production_host_ip} 'bash -i -c "\
-		pm2 start ~/frontend/index.js --name frontend \
+		pm2 delete frontend 2> /dev/null && pm2 start node --name frontend -- frontend \
 	"'
