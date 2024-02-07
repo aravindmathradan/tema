@@ -1,8 +1,8 @@
-import { BASE_API_URL } from "$env/static/private";
+import { env } from "$env/dynamic/private";
 import { type RequestEvent } from "@sveltejs/kit";
 
 async function fetchCurrentUser(authToken: string) {
-	const res = await fetch(`${BASE_API_URL}/users/me`, {
+	const res = await fetch(`${env.BASE_API_URL}/users/me`, {
 		method: "GET",
 		headers: {
 			Authorization: `Bearer ${authToken}`,
@@ -26,7 +26,7 @@ async function fetchCurrentUser(authToken: string) {
 }
 
 async function refreshAuthentication(refreshToken: string) {
-	const res = await fetch(`${BASE_API_URL}/tokens/authentication`, {
+	const res = await fetch(`${env.BASE_API_URL}/tokens/authentication`, {
 		method: "POST",
 		body: JSON.stringify({
 			scope: "refresh",

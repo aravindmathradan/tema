@@ -2,7 +2,7 @@ import type { PageServerLoad, Actions } from "./$types";
 import { fail, redirect, type NumericRange } from "@sveltejs/kit";
 import { message, setError, superValidate } from "sveltekit-superforms/server";
 import { formSchema } from "./schema";
-import { BASE_API_URL } from "$env/static/private";
+import { env } from "$env/dynamic/private";
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
@@ -22,7 +22,7 @@ export const actions: Actions = {
 			});
 		}
 
-		const res = await fetch(`${BASE_API_URL}/tokens/authentication`, {
+		const res = await fetch(`${env.BASE_API_URL}/tokens/authentication`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

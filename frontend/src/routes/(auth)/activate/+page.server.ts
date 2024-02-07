@@ -2,7 +2,7 @@ import type { PageServerLoad, Actions } from "./$types";
 import { fail, redirect } from "@sveltejs/kit";
 import { setError, superValidate } from "sveltekit-superforms/server";
 import { formSchema } from "./schema";
-import { BASE_API_URL } from "$env/static/private";
+import { env } from "$env/dynamic/private";
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
@@ -22,7 +22,7 @@ export const actions: Actions = {
 			});
 		}
 
-		const res = await fetch(`${BASE_API_URL}/users/activate`, {
+		const res = await fetch(`${env.BASE_API_URL}/users/activate`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",
