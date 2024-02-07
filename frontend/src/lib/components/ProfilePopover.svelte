@@ -5,7 +5,6 @@
 
 	export let userName: string | undefined;
 	export let userEmail: string | undefined;
-	export let transcriptDropdownOpen: boolean;
 	export let avatarOnly: boolean;
 
 	const profilePictureFallbackLetters = userName
@@ -26,25 +25,14 @@
 					</p></Avatar.Fallback
 				>
 			</Avatar.Root>
-			{#if transcriptDropdownOpen}
-				<div
-					class={avatarOnly
-						? "text-start hidden hover:bg-white/19 rounded-md"
-						: "text-start md:inline-block hover:bg-white/19 rounded-md"}
-				>
-					<p class="font-medium capitalize">{userName}</p>
-					<p class="text-gray-500">{userEmail}</p>
-				</div>
-			{:else}
-				<div
-					class={avatarOnly
-						? "text-start hidden hover:bg-white/19 rounded-md"
-						: "text-start md:inline-block hover:bg-white/19 rounded-md"}
-				>
-					<p class="font-medium capitalize">{userName}</p>
-					<p class="text-gray-500">{userEmail}</p>
-				</div>
-			{/if}
+			<div
+				class={avatarOnly
+					? "text-start hidden hover:bg-white/19 rounded-md"
+					: "text-start hidden md:inline-block hover:bg-white/19 rounded-md"}
+			>
+				<p class="font-medium capitalize">{userName}</p>
+				<p class="text-gray-500">{userEmail}</p>
+			</div>
 		</div>
 	</Popover.Trigger>
 	<Popover.Content class="flex flex-col w-fit p-2">
