@@ -54,15 +54,16 @@ func generateToken(userID int64, ttl time.Duration, scope string) (*Token, error
 }
 
 func ValidateTokenPlaintext(v *validator.Validator, tokenPlaintext string) {
-	v.Check(validator.NotBlank(tokenPlaintext), "token", "must be provided")
-	v.Check(len(tokenPlaintext) == 26, "token", "must be 26 bytes long")
+	v.Check(validator.NotBlank(tokenPlaintext), "token", validator.EBLANKFIELD, "must be provided")
+	v.Check(len(tokenPlaintext) == 26, "token", validator.EINVALIDTOKEN, "must be 26 bytes long")
 }
 
 func ValidateTokenScope(v *validator.Validator, scope string) {
-	v.Check(validator.NotBlank(scope), "scope", "must be provided")
+	v.Check(validator.NotBlank(scope), "scope", validator.EBLANKFIELD, "must be provided")
 	v.Check(
 		validator.PermittedValue[string](scope, ScopeAuthentication, ScopeRefresh),
 		"scope",
+		validator.EVALUENOTPERMITTED,
 		fmt.Sprintf("must be %s or %s", ScopeAuthentication, ScopeRefresh),
 	)
 }

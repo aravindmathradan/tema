@@ -7,31 +7,55 @@ import (
 	"unicode/utf8"
 )
 
+type errorCode string
+
+const (
+	EBLANKFIELD        errorCode = "blank_field"
+	EVALUENOTPERMITTED errorCode = "value_not_permitted"
+	EMAXCHARS          errorCode = "max_chars"
+	EMINCHARS          errorCode = "min_chars"
+	EINVALIDEMAIL      errorCode = "invalid_email"
+	EEMAILEXISTS       errorCode = "email_exists"
+	EINVALIDTOKEN      errorCode = "invalid_token"
+	EINVALIDFILTER     errorCode = "invalid_page_filter"
+	ENOTFOUND          errorCode = "not_found"
+	EACCOUNTINACTIVE   errorCode = "inactive_account"
+	EALREADYACTIVE     errorCode = "already_active"
+)
+
 var (
 	EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 )
 
+type FieldError struct {
+	SubCode errorCode
+	Message string
+}
+
 type Validator struct {
-	Errors map[string]string
+	Errors map[string]FieldError
 }
 
 func New() *Validator {
-	return &Validator{Errors: make(map[string]string)}
+	return &Validator{Errors: make(map[string]FieldError)}
 }
 
 func (v *Validator) Valid() bool {
 	return len(v.Errors) == 0
 }
 
-func (v *Validator) AddError(key, message string) {
+func (v *Validator) AddError(key string, subCode errorCode, message string) {
 	if _, exists := v.Errors[key]; !exists {
-		v.Errors[key] = message
+		v.Errors[key] = FieldError{
+			SubCode: subCode,
+			Message: message,
+		}
 	}
 }
 
-func (v *Validator) Check(ok bool, key, message string) {
+func (v *Validator) Check(ok bool, key string, subCode errorCode, message string) {
 	if !ok {
-		v.AddError(key, message)
+		v.AddError(key, subCode, message)
 	}
 }
 

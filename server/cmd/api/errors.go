@@ -5,7 +5,32 @@ import (
 	"log/slog"
 	"net/http"
 	"runtime/debug"
+
+	"github.com/aravindmathradan/tema/internal/validator"
 )
+
+type errorCode string
+
+const (
+	ENOTFOUND           errorCode = "not_found"
+	EINTERNAL           errorCode = "internal"
+	EMETHODNOTALLOWED   errorCode = "method_not_allowed"
+	EFAILEDVALIDATION   errorCode = "validation_failed"
+	EEDITCONFLICT       errorCode = "edit_conflict"
+	ERATELIMITEXCEEDED  errorCode = "rate_limit_exceeded"
+	EINVALIDCREDENTIALS errorCode = "invalid_credentials"
+	EINVALIDTOKEN       errorCode = "invalid_token"
+	EBADREQUEST         errorCode = "bad_request"
+	EAUTHREQUIRED       errorCode = "authentication_required"
+	EINACTIVEACCOUNT    errorCode = "inactive_account"
+	ENOTPERMITTED       errorCode = "not_permitted"
+)
+
+type errorRes struct {
+	code    errorCode
+	message string
+	fields  map[string]validator.FieldError
+}
 
 func (app *application) logError(r *http.Request, err error) {
 	var (
@@ -22,7 +47,7 @@ func (app *application) logError(r *http.Request, err error) {
 	)
 }
 
-func (app *application) errorResponse(w http.ResponseWriter, r *http.Request, status int, message any) {
+func (app *application) errorResponse(w http.ResponseWriter, r *http.Request, status int, message errorRes) {
 	err := app.writeJSON(w, status, envelope{"error": message}, nil)
 	if err != nil {
 		app.logError(r, err)
@@ -33,61 +58,111 @@ func (app *application) errorResponse(w http.ResponseWriter, r *http.Request, st
 func (app *application) serverErrorResponse(w http.ResponseWriter, r *http.Request, err error) {
 	app.logError(r, err)
 
-	message := "the server encountered a problem and could not process your request"
-	app.errorResponse(w, r, http.StatusInternalServerError, message)
+	res := errorRes{
+		code:    EINTERNAL,
+		message: "the server encountered a problem and could not process your request",
+		fields:  map[string]validator.FieldError{},
+	}
+	app.errorResponse(w, r, http.StatusInternalServerError, res)
 }
 
 func (app *application) notFoundResponse(w http.ResponseWriter, r *http.Request) {
-	message := "the requested resource could not be found"
-	app.errorResponse(w, r, http.StatusNotFound, message)
+	res := errorRes{
+		code:    ENOTFOUND,
+		message: "the requested resource could not be found",
+		fields:  map[string]validator.FieldError{},
+	}
+	app.errorResponse(w, r, http.StatusNotFound, res)
 }
 
 func (app *application) methodNotAllowedResponse(w http.ResponseWriter, r *http.Request) {
-	message := fmt.Sprintf("the %s method is not supported for this resource", r.Method)
-	app.errorResponse(w, r, http.StatusMethodNotAllowed, message)
+	res := errorRes{
+		code:    EMETHODNOTALLOWED,
+		message: fmt.Sprintf("the %s method is not supported for this resource", r.Method),
+		fields:  map[string]validator.FieldError{},
+	}
+	app.errorResponse(w, r, http.StatusMethodNotAllowed, res)
 }
 
 func (app *application) badRequestResponse(w http.ResponseWriter, r *http.Request, err error) {
-	app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+	res := errorRes{
+		code:    EBADREQUEST,
+		message: err.Error(),
+		fields:  map[string]validator.FieldError{},
+	}
+	app.errorResponse(w, r, http.StatusBadRequest, res)
 }
 
-func (app *application) failedValidationResponse(w http.ResponseWriter, r *http.Request, errors map[string]string) {
-	app.errorResponse(w, r, http.StatusUnprocessableEntity, errors)
+func (app *application) failedValidationResponse(w http.ResponseWriter, r *http.Request, errors map[string]validator.FieldError) {
+	res := errorRes{
+		code:    EFAILEDVALIDATION,
+		message: "input validation failed. please check input fields.",
+		fields:  errors,
+	}
+	app.errorResponse(w, r, http.StatusUnprocessableEntity, res)
 }
 
 func (app *application) editConflictResponse(w http.ResponseWriter, r *http.Request) {
-	message := "unable to update the record due to an edit conflict, please try again"
-	app.errorResponse(w, r, http.StatusConflict, message)
+	res := errorRes{
+		code:    EEDITCONFLICT,
+		message: "unable to update the record due to an edit conflict, please try again",
+		fields:  map[string]validator.FieldError{},
+	}
+	app.errorResponse(w, r, http.StatusConflict, res)
 }
 
 func (app *application) rateLimitExceededResponse(w http.ResponseWriter, r *http.Request) {
-	message := "rate limit exceeded"
-	app.errorResponse(w, r, http.StatusTooManyRequests, message)
+	res := errorRes{
+		code:    ERATELIMITEXCEEDED,
+		message: "rate limit exceeded",
+		fields:  map[string]validator.FieldError{},
+	}
+	app.errorResponse(w, r, http.StatusTooManyRequests, res)
 }
 
 func (app *application) invalidCredentialsResponse(w http.ResponseWriter, r *http.Request) {
-	message := "invalid authentication credentials"
-	app.errorResponse(w, r, http.StatusUnauthorized, message)
+	res := errorRes{
+		code:    EINVALIDCREDENTIALS,
+		message: "invalid authentication credentials",
+		fields:  map[string]validator.FieldError{},
+	}
+	app.errorResponse(w, r, http.StatusUnauthorized, res)
 }
 
 func (app *application) invalidAuthenticationTokenResponse(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("WWW-Authenticate", "Bearer")
 
-	message := "invalid or missing authentication token"
-	app.errorResponse(w, r, http.StatusUnauthorized, message)
+	res := errorRes{
+		code:    EINVALIDTOKEN,
+		message: "invalid or missing authentication token",
+		fields:  map[string]validator.FieldError{},
+	}
+	app.errorResponse(w, r, http.StatusUnauthorized, res)
 }
 
 func (app *application) authenticationRequiredResponse(w http.ResponseWriter, r *http.Request) {
-	message := "you must be authenticated to access this resource"
-	app.errorResponse(w, r, http.StatusUnauthorized, message)
+	res := errorRes{
+		code:    EAUTHREQUIRED,
+		message: "you must be authenticated to access this resource",
+		fields:  map[string]validator.FieldError{},
+	}
+	app.errorResponse(w, r, http.StatusUnauthorized, res)
 }
 
 func (app *application) inactiveAccountResponse(w http.ResponseWriter, r *http.Request) {
-	message := "your account must be activated to access this resource"
-	app.errorResponse(w, r, http.StatusForbidden, message)
+	res := errorRes{
+		code:    EINACTIVEACCOUNT,
+		message: "your account must be activated to access this resource",
+		fields:  map[string]validator.FieldError{},
+	}
+	app.errorResponse(w, r, http.StatusForbidden, res)
 }
 
 func (app *application) notPermittedResponse(w http.ResponseWriter, r *http.Request) {
-	message := "your user account doesn't have the necessary permissions to access this resource"
-	app.errorResponse(w, r, http.StatusForbidden, message)
+	res := errorRes{
+		code:    ENOTPERMITTED,
+		message: "your user account doesn't have the necessary permissions to access this resource",
+		fields:  map[string]validator.FieldError{},
+	}
+	app.errorResponse(w, r, http.StatusForbidden, res)
 }

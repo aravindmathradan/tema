@@ -89,7 +89,7 @@ func (app *application) createAuthenticationTokenHandler(w http.ResponseWriter, 
 		if err != nil {
 			switch {
 			case errors.Is(err, data.ErrRecordNotFound):
-				v.AddError("refresh_token", "invalid or expired refresh token")
+				v.AddError("refresh_token", validator.EINVALIDTOKEN, "invalid or expired refresh token")
 				app.failedValidationResponse(w, r, v.Errors)
 			default:
 				app.serverErrorResponse(w, r, err)
@@ -132,7 +132,7 @@ func (app *application) createPasswordResetTokenHandler(w http.ResponseWriter, r
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrRecordNotFound):
-			v.AddError("email", "no matching email address found")
+			v.AddError("email", validator.ENOTFOUND, "no matching email address found")
 			app.failedValidationResponse(w, r, v.Errors)
 		default:
 			app.serverErrorResponse(w, r, err)
@@ -141,7 +141,7 @@ func (app *application) createPasswordResetTokenHandler(w http.ResponseWriter, r
 	}
 
 	if !user.Activated {
-		v.AddError("email", "user account must be activated by verifying the email")
+		v.AddError("email", validator.EACCOUNTINACTIVE, "user account must be activated by verifying the email")
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
@@ -198,7 +198,7 @@ func (app *application) createActivationTokenHandler(w http.ResponseWriter, r *h
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrRecordNotFound):
-			v.AddError("email", "no matching email address found")
+			v.AddError("email", validator.ENOTFOUND, "no matching email address found")
 			app.failedValidationResponse(w, r, v.Errors)
 		default:
 			app.serverErrorResponse(w, r, err)
@@ -207,7 +207,7 @@ func (app *application) createActivationTokenHandler(w http.ResponseWriter, r *h
 	}
 
 	if user.Activated {
-		v.AddError("email", "account has already been activated")
+		v.AddError("email", validator.EALREADYACTIVE, "account has already been activated")
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}

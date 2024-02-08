@@ -70,19 +70,19 @@ func (p *password) Matches(plaintextPassword string) (bool, error) {
 }
 
 func ValidateEmail(v *validator.Validator, email string) {
-	v.Check(validator.NotBlank(email), "email", "must be provided")
-	v.Check(validator.Matches(email, validator.EmailRX), "email", "must be a valid email address")
+	v.Check(validator.NotBlank(email), "email", validator.EBLANKFIELD, "must be provided")
+	v.Check(validator.Matches(email, validator.EmailRX), "email", validator.EINVALIDEMAIL, "must be a valid email address")
 }
 
 func ValidatePasswordPlaintext(v *validator.Validator, password string) {
-	v.Check(validator.NotBlank(password), "password", "must be provided")
-	v.Check(validator.MinChars(password, 8), "password", "must be at least 8 characters long")
-	v.Check(validator.MaxChars(password, 72), "password", "must not be more than 72 characters long")
+	v.Check(validator.NotBlank(password), "password", validator.EBLANKFIELD, "must be provided")
+	v.Check(validator.MinChars(password, 8), "password", validator.EMINCHARS, "must be at least 8 characters long")
+	v.Check(validator.MaxChars(password, 72), "password", validator.EMAXCHARS, "must not be more than 72 characters long")
 }
 
 func ValidateUser(v *validator.Validator, user *User) {
-	v.Check(validator.NotBlank(user.Name), "name", "must be provided")
-	v.Check(validator.MaxChars(user.Name, 100), "name", "must not be more than 100 characters long")
+	v.Check(validator.NotBlank(user.Name), "name", validator.EBLANKFIELD, "must be provided")
+	v.Check(validator.MaxChars(user.Name, 100), "name", validator.EMAXCHARS, "must not be more than 100 characters long")
 
 	ValidateEmail(v, user.Email)
 
