@@ -1,8 +1,10 @@
 import type { PageServerLoad, Actions } from "./$types";
-import { fail, redirect } from "@sveltejs/kit";
+import { error, fail, redirect } from "@sveltejs/kit";
 import { setError, superValidate } from "sveltekit-superforms/server";
 import { formSchema } from "./schema";
 import { env } from "$env/dynamic/private";
+import { errorResponseSchema } from "$lib/types/errors";
+import { ServerErrorCodes } from "$lib/constants/error-codes";
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
@@ -22,7 +24,7 @@ export const actions: Actions = {
 			});
 		}
 
-		const res = await fetch(`${env.BASE_API_URL}/users/activate`, {
+		const res = await event.fetch(`${env.BASE_API_URL}/users/activate`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",
@@ -32,11 +34,14 @@ export const actions: Actions = {
 			}),
 		});
 
-		const response = await res.json();
 		if (!res.ok) {
-			for (const field in response.error) {
-				return setError(form, field, response.error[field]);
+			const response = errorResponseSchema.parse(await res.json());
+			if (res.status === 422 && response.error.code === ServerErrorCodes.EFAILEDVALIDATION) {
+				return setError(form, "token", "The token is either invalid or expired");
 			}
+			error(500, {
+				message: "Something went wrong. Please try again later by re-generating token",
+			});
 		}
 
 		redirect(303, "/login");

@@ -4,18 +4,26 @@
 	import type { FormOptions } from "formsnap";
 	import { formSchema, type FormSchema } from "./schema";
 	import type { SuperValidated } from "sveltekit-superforms";
+	import { goto } from "$app/navigation";
 
 	export let form: SuperValidated<FormSchema>;
 
 	let formError: string;
 	const options: FormOptions<FormSchema> = {
+		applyAction: false,
 		onSubmit() {
 			// toast.info("Submitting...");
 		},
 		onResult({ result }) {
-			formError = result.data?.form.message;
-			if (result.status === 200) toast.success("Account created successfully!");
-			if (result.status === 400) toast.error("Could not signup!");
+			if (result.status >= 200 && result.status < 400) {
+				toast.info("Thank you for joining!");
+			}
+			if (result.type === "redirect") {
+				goto(result.location);
+			}
+		},
+		onError({ result }) {
+			toast.error(result.error.message);
 		},
 	};
 </script>

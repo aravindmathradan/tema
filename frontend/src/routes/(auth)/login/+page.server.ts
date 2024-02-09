@@ -1,8 +1,11 @@
 import type { PageServerLoad, Actions } from "./$types";
-import { fail, redirect, type NumericRange } from "@sveltejs/kit";
-import { message, setError, superValidate } from "sveltekit-superforms/server";
-import { formSchema } from "./schema";
+import { fail, redirect, error } from "@sveltejs/kit";
+import { superValidate } from "sveltekit-superforms/server";
+import { formSchema, responseSchema } from "./schema";
 import { env } from "$env/dynamic/private";
+import { ServerErrorCodes } from "$lib/constants/error-codes";
+import { DateTime, Interval } from "luxon";
+import { errorResponseSchema } from "$lib/types/errors";
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
@@ -22,7 +25,7 @@ export const actions: Actions = {
 			});
 		}
 
-		const res = await fetch(`${env.BASE_API_URL}/tokens/authentication`, {
+		const res = await event.fetch(`${env.BASE_API_URL}/tokens/authentication`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -35,32 +38,42 @@ export const actions: Actions = {
 			}),
 		});
 
-		const response = await res.json();
 		if (!res.ok) {
-			if (typeof response.error === "string") {
-				return message(form, response.error, {
-					status: <NumericRange<400, 599>>res.status,
+			const response = errorResponseSchema.parse(await res.json());
+			if (res.status === 401 && response.error.code === ServerErrorCodes.EINVALIDCREDENTIALS) {
+				error(401, {
+					message: "Email/Password do not match our records",
 				});
 			}
-			for (const field in response.error) {
-				return setError(form, field, response.error[field]);
-			}
+			error(500, {
+				message: "Something went wrong. Please try again later",
+			});
 		}
 
-		event.cookies.set("auth-token", response.authentication_token.token, {
+		const response = responseSchema.parse(await res.json());
+		let authInterval = Interval.fromDateTimes(
+			DateTime.now(),
+			DateTime.fromJSDate(response.authenticationToken.expiry),
+		);
+		let refreshInterval = Interval.fromDateTimes(
+			DateTime.now(),
+			DateTime.fromJSDate(response.refreshToken.expiry),
+		);
+
+		event.cookies.set("auth-token", response.authenticationToken.token, {
 			path: "/",
 			httpOnly: true,
 			sameSite: "strict",
 			secure: process.env.NODE_ENV === "production",
-			maxAge: 60 * 60 * 24 * 7, // 1 week
+			maxAge: authInterval.length("seconds"),
 		});
 
-		event.cookies.set("refresh-token", response.refresh_token.token, {
+		event.cookies.set("refresh-token", response.refreshToken.token, {
 			path: "/",
 			httpOnly: true,
 			sameSite: "strict",
 			secure: process.env.NODE_ENV === "production",
-			maxAge: 60 * 60 * 24 * 30, // 1 month
+			maxAge: refreshInterval.length("seconds"),
 		});
 
 		redirect(303, "/app");

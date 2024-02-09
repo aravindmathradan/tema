@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { userSchema } from "$lib/types/user";
 
 export const formSchema = z
 	.object({
@@ -16,3 +17,8 @@ export const formSchema = z
 	});
 
 export type FormSchema = typeof formSchema;
+
+export const responseSchema = z.object({
+	user: userSchema,
+	message: z.string(),
+});

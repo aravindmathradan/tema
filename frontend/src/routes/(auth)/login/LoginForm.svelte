@@ -4,18 +4,21 @@
 	import { formSchema, type FormSchema } from "./schema";
 	import type { SuperValidated } from "sveltekit-superforms";
 	import { toast } from "svelte-sonner";
+	import { goto } from "$app/navigation";
 
 	export let form: SuperValidated<FormSchema>;
 
 	let formError: string;
 	const options: FormOptions<FormSchema> = {
-		onSubmit() {
-			// toast.info("Submitting...");
-		},
+		applyAction: false,
 		onResult({ result }) {
-			formError = result.data?.form.message;
-			if (result.status === 200) toast.success("Welcome!");
-			if (result.status >= 400) toast.error("Could not login!");
+			if (result.type === "redirect") {
+				goto(result.location);
+			}
+		},
+		onError({ result }) {
+			if (result.status === 401) formError = result.error.message;
+			else toast.error(result.error.message);
 		},
 	};
 </script>

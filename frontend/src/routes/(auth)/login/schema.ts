@@ -6,3 +6,16 @@ export const formSchema = z.object({
 });
 
 export type FormSchema = typeof formSchema;
+
+export const responseSchema = z.object({
+	authenticationToken: z.object({
+		token: z.string(),
+		expiry: z.coerce.date(),
+	}),
+	refreshToken: z.object({
+		token: z.string(),
+		expiry: z.coerce.date(),
+	}),
+});
+
+export type ResponseSchema = z.infer<typeof responseSchema>;
