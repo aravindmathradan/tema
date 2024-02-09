@@ -10,17 +10,17 @@ import (
 type errorCode string
 
 const (
-	EBLANKFIELD        errorCode = "blank_field"
-	EVALUENOTPERMITTED errorCode = "value_not_permitted"
-	EMAXCHARS          errorCode = "max_chars"
-	EMINCHARS          errorCode = "min_chars"
-	EINVALIDEMAIL      errorCode = "invalid_email"
-	EEMAILEXISTS       errorCode = "email_exists"
-	EINVALIDTOKEN      errorCode = "invalid_token"
-	EINVALIDFILTER     errorCode = "invalid_page_filter"
-	ENOTFOUND          errorCode = "not_found"
-	EACCOUNTINACTIVE   errorCode = "inactive_account"
-	EALREADYACTIVE     errorCode = "already_active"
+	EBLANKFIELD         errorCode = "blank_field"
+	EVALUENOTPERMITTED  errorCode = "value_not_permitted"
+	EMAXCHARS           errorCode = "max_chars"
+	EMINCHARS           errorCode = "min_chars"
+	EINVALIDEMAIL       errorCode = "invalid_email"
+	EEMAILALREADYEXISTS errorCode = "email_already_exists"
+	EINVALIDTOKEN       errorCode = "invalid_token"
+	EINVALIDFILTER      errorCode = "invalid_page_filter"
+	ENOTFOUND           errorCode = "not_found"
+	EACCOUNTINACTIVE    errorCode = "inactive_account"
+	EALREADYACTIVE      errorCode = "already_active"
 )
 
 var (
@@ -28,8 +28,8 @@ var (
 )
 
 type FieldError struct {
-	SubCode errorCode
-	Message string
+	SubCode errorCode `json:"sub_code"`
+	Message string    `json:"message"`
 }
 
 type Validator struct {
