@@ -12,5 +12,5 @@
 	</script>
 </svelte:head>
 
-<Toaster theme={$theme} />
+<Toaster theme={$theme} richColors />
 <slot />
