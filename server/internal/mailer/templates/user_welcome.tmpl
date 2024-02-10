@@ -5,9 +5,9 @@ Hi {{.Name}},
 
 Thanks for signing up for a Tema account. We're excited to have you on board!
 
-Please send a request to the `PUT /v1/users/activate` endpoint with the following JSON body to activate your account:
+Here's the token to activate your account:
 
-{"token": "{{.activationToken}}"}
+{{.activationToken}}
 
 Please note that this is a one-time use token and it will expire in 3 days.
 
@@ -29,11 +29,10 @@ Team Tema
       board!
     </p>
     <p>
-      Please send a request to the <code>PUT /v1/users/activate</code> endpoint
-      with the following JSON body to activate your account:
+      Here's the token to activate your account:
     </p>
     <pre><code>
-	{"token": "{{.activationToken}}"}
+	{{.activationToken}}
 	</code></pre>
     <p>
       Please note that this is a one-time use token and it will expire in 3
