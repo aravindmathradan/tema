@@ -134,6 +134,38 @@ func (m UserModel) Insert(user *User) error {
 	return nil
 }
 
+func (m UserModel) GetByID(id int64) (*User, error) {
+	query := `
+		SELECT id, created_at, updated_at, name, email, activated, version
+		FROM users
+		WHERE id = $1`
+
+	var user User
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	err := m.DB.QueryRowContext(ctx, query, id).Scan(
+		&user.ID,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&user.Name,
+		&user.Email,
+		&user.Activated,
+		&user.Version,
+	)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+
+	return &user, nil
+}
+
 func (m UserModel) GetByEmail(email string) (*User, error) {
 	query := `
         SELECT id, created_at, updated_at, name, email, password_hash, activated, version
