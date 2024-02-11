@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/aravindmathradan/tema/internal/validator"
@@ -64,58 +63,6 @@ func (m ProjectModel) Get(id int64) (*Project, error) {
 	}
 
 	return &project, nil
-}
-
-func (m ProjectModel) GetAll(name string, filters Filters) ([]*Project, Metadata, error) {
-	query := fmt.Sprintf(`
-		SELECT  count(*) OVER(), id, created_at, updated_at, name, description, version
-		FROM projects
-		WHERE to_tsvector('english', name) @@ plainto_tsquery('english', $1) OR $1 = ''
-		ORDER BY %s %s, id ASC
-		LIMIT $2 OFFSET $3`, filters.sortColumn(), filters.sortDirection())
-
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	args := []any{name, filters.limit(), filters.offset()}
-
-	rows, err := m.DB.QueryContext(ctx, query, args...)
-	if err != nil {
-		return nil, Metadata{}, err
-	}
-
-	defer rows.Close()
-
-	totalRecords := 0
-	projects := []*Project{}
-
-	for rows.Next() {
-		var project Project
-
-		err := rows.Scan(
-			&totalRecords,
-			&project.ID,
-			&project.CreatedAt,
-			&project.UpdatedAt,
-			&project.Name,
-			&project.Description,
-			&project.Version,
-		)
-
-		if err != nil {
-			return nil, Metadata{}, err
-		}
-
-		projects = append(projects, &project)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, Metadata{}, err
-	}
-
-	metadata := calculateMetadata(totalRecords, filters.Page, filters.PageSize)
-
-	return projects, metadata, nil
 }
 
 func (m ProjectModel) Insert(project *Project) error {
