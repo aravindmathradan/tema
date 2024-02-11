@@ -2,9 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS permissions (
 	id bigserial PRIMARY KEY,
-	code text NOT NULL,
-	created_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
-	updated_at timestamp(0) with time zone NOT NULL DEFAULT NOW()
+	code text NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users_permissions (
@@ -15,10 +13,10 @@ CREATE TABLE IF NOT EXISTS users_permissions (
 	updated_at timestamp(0) with time zone NOT NULL DEFAULT NOW()
 );
 
-INSERT INTO permissions (code, created_at, updated_at)
+INSERT INTO permissions (code)
 VALUES
-	('projects:read', NOW(), NOW()),
-	('projects:write', NOW(), NOW());
+	('projects:read'),
+	('projects:write');
 
 -- +goose StatementEnd
 
