@@ -11,7 +11,8 @@ import (
 
 func (app *application) listProjectsHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		Name string
+		Name     string
+		Archived bool
 		data.Filters
 	}
 
@@ -19,6 +20,7 @@ func (app *application) listProjectsHandler(w http.ResponseWriter, r *http.Reque
 	qs := r.URL.Query()
 
 	input.Name = app.readString(qs, "name", "")
+	input.Archived = app.readBool(qs, "archived", false, v)
 
 	input.Filters.Page = app.readInt(qs, "page", 1, v)
 	input.Filters.PageSize = app.readInt(qs, "page_size", 20, v)
@@ -31,7 +33,8 @@ func (app *application) listProjectsHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	projects, metadata, err := app.models.Projects.GetAll(input.Name, input.Filters)
+	currentUser := app.contextGetUser(r)
+	projects, metadata, err := app.models.Projects.GetAllForOwner(currentUser.ID, input.Name, input.Archived, input.Filters)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
@@ -66,6 +69,9 @@ func (app *application) createProjectHandler(w http.ResponseWriter, r *http.Requ
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
+
+	currentUser := app.contextGetUser(r)
+	project.OwnerID = currentUser.ID
 
 	err = app.models.Projects.Insert(project)
 	if err != nil {
@@ -124,11 +130,12 @@ func (app *application) updateProjectHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Use pointers for the Name and Description fields so that we get nil instead of -
-	// zero value such as "", when we skip a key for partial updates.
+	// Use pointers for the Name, Description and Archived fields so that we get nil instead of -
+	// zero value such as "" or false, when we skip a key for partial updates.
 	var input struct {
 		Name        *string `json:"name"`
 		Description *string `json:"description"`
+		Archived    *bool   `json:"archived"`
 	}
 
 	err = app.readJSON(w, r, &input)
@@ -143,6 +150,10 @@ func (app *application) updateProjectHandler(w http.ResponseWriter, r *http.Requ
 
 	if input.Description != nil {
 		project.Description = *input.Description
+	}
+
+	if input.Archived != nil {
+		project.Archived = *input.Archived
 	}
 
 	v := validator.New()

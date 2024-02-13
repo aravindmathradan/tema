@@ -16,6 +16,8 @@ type Project struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
+	Archived    bool      `json:"archived"`
+	OwnerID     int64     `json:"owner_id"`
 	Version     int32     `json:"version"`
 }
 
@@ -36,7 +38,7 @@ func (m ProjectModel) Get(id int64) (*Project, error) {
 	}
 
 	query := `
-		SELECT id, created_at, updated_at, name, description, version
+		SELECT id, created_at, updated_at, name, description, archived, owner_id, version
 		FROM projects
 		WHERE id=$1`
 
@@ -51,6 +53,8 @@ func (m ProjectModel) Get(id int64) (*Project, error) {
 		&project.UpdatedAt,
 		&project.Name,
 		&project.Description,
+		&project.Archived,
+		&project.OwnerID,
 		&project.Version,
 	)
 
@@ -66,18 +70,19 @@ func (m ProjectModel) Get(id int64) (*Project, error) {
 	return &project, nil
 }
 
-func (m ProjectModel) GetAll(name string, filters Filters) ([]*Project, Metadata, error) {
+func (m ProjectModel) GetAllForOwner(ownerID int64, name string, archived bool, filters Filters) ([]*Project, Metadata, error) {
 	query := fmt.Sprintf(`
-		SELECT  count(*) OVER(), id, created_at, updated_at, name, description, version
+		SELECT  count(*) OVER(), id, created_at, updated_at, name, description, archived, owner_id, version
 		FROM projects
-		WHERE to_tsvector('english', name) @@ plainto_tsquery('english', $1) OR $1 = ''
+		WHERE owner_id = $1 AND archived = $2
+		AND (to_tsvector('english', name) @@ plainto_tsquery('english', $3) OR $3 = '')
 		ORDER BY %s %s, id ASC
-		LIMIT $2 OFFSET $3`, filters.sortColumn(), filters.sortDirection())
+		LIMIT $4 OFFSET $5`, filters.sortColumn(), filters.sortDirection())
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	args := []any{name, filters.limit(), filters.offset()}
+	args := []any{ownerID, archived, name, filters.limit(), filters.offset()}
 
 	rows, err := m.DB.QueryContext(ctx, query, args...)
 	if err != nil {
@@ -99,6 +104,8 @@ func (m ProjectModel) GetAll(name string, filters Filters) ([]*Project, Metadata
 			&project.UpdatedAt,
 			&project.Name,
 			&project.Description,
+			&project.Archived,
+			&project.OwnerID,
 			&project.Version,
 		)
 
@@ -120,29 +127,36 @@ func (m ProjectModel) GetAll(name string, filters Filters) ([]*Project, Metadata
 
 func (m ProjectModel) Insert(project *Project) error {
 	query := `
-		INSERT INTO projects (name, description)
-		VALUES ($1, $2)
-		RETURNING id, created_at, updated_at, version`
+		INSERT INTO projects (name, description, owner_id)
+		VALUES ($1, $2, $3)
+		RETURNING id, created_at, updated_at, archived, version`
 
-	args := []any{project.Name, project.Description}
+	args := []any{project.Name, project.Description, project.OwnerID}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	return m.DB.QueryRowContext(ctx, query, args...).Scan(&project.ID, &project.CreatedAt, &project.UpdatedAt, &project.Version)
+	return m.DB.QueryRowContext(ctx, query, args...).Scan(
+		&project.ID,
+		&project.CreatedAt,
+		&project.UpdatedAt,
+		&project.Archived,
+		&project.Version,
+	)
 }
 
 func (m ProjectModel) Update(project *Project) error {
 	query := `
         UPDATE projects 
-        SET name = $1, description = $2, updated_at = $3, version = version + 1
-        WHERE id = $4 AND version = $5
+        SET name = $1, description = $2, archived = $3, updated_at = $4, version = version + 1
+        WHERE id = $5 AND version = $6
 		RETURNING version`
 
 	// Create an args slice containing the values for the placeholder parameters.
 	args := []any{
 		project.Name,
 		project.Description,
+		project.Archived,
 		time.Now(),
 		project.ID,
 		project.Version,
