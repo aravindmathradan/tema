@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS projects (
 	updated_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
 	name text NOT NULL,
 	description text NOT NULL,
+	archived boolean NOT NULL DEFAULT FALSE,
+	owner_id bigint NOT NULL REFERENCES users ON DELETE CASCADE,
 	version integer NOT NULL DEFAULT 1
 );
 -- +goose StatementEnd
