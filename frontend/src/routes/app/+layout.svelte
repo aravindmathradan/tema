@@ -2,16 +2,17 @@
 	import CodeExplorer from "$lib/components/CodeExplorer.svelte";
 	import Sidebar from "$lib/components/Sidebar.svelte";
 	import Titlebar from "$lib/components/Titlebar.svelte";
+	import type { LayoutServerData } from "./$types";
 
-	export let data;
+	export let data: LayoutServerData;
 
-	$: profile = data.profile;
+
 </script>
 
 <div class="flex border mx-auto w-full h-full">
 	<Sidebar />
 	<div class="flex flex-1 flex-col">
-		<Titlebar {profile} />
+		<Titlebar user={data.user} />
 		<div class="flex flex-1">
 			<main class="flex-1">
 				<slot />

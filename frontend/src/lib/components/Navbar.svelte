@@ -3,7 +3,7 @@
 	import ProfilePopover from "./ProfilePopover.svelte";
 	import ThemeSwitcher from "./ThemeSwitcher.svelte";
 
-	export let profile: any;
+	export let user: any;
 </script>
 
 <div class="flex items-center justify-between border w-full p-3">
@@ -11,7 +11,7 @@
 
 	<div class="flex items-center h-full">
 		<ThemeSwitcher />
-		{#if profile}
+		{#if user}
 			<a
 				href="/app"
 				class="flex items-center justify-center gap-2 leading-normal text-lg font-medium bg-primary text-primary-foreground ml-4 px-4 py-2 rounded-md hover:bg-primary/90 active:translate-y-[1px] active:translate-x-[1px] transition-all duration-300 ease-out"
@@ -29,10 +29,10 @@
 				<Enter class="w-5 h-5" />
 			</a>
 		{/if}
-		{#if profile}
+		{#if user}
 			<ProfilePopover
-				userName={profile?.name}
-				userEmail={profile?.email}
+				userName={user?.name}
+				userEmail={user?.email}
 				transcriptDropdownOpen={false}
 				avatarOnly={true}
 				class="md:p-2 hover:bg-secondary/55 rounded-md transition-colors duration-300 ease-out"

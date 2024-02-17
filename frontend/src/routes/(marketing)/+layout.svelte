@@ -2,11 +2,9 @@
 	import Navbar from "$lib/components/Navbar.svelte";
 
 	export let data;
-
-	$: profile = data.profile;
 </script>
 
 <div class="flex flex-col border mx-auto w-full h-full">
-	<Navbar {profile} />
+	<Navbar user={data.user} />
 	<slot />
 </div>
