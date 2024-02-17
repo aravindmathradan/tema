@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Toaster } from "svelte-sonner";
 	import "../app.css";
-	import { theme } from "$lib/stores/store";
+	import { theme } from "$lib/stores/theme";
 </script>
 
 <svelte:head>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Switch } from "$lib/components/ui/switch";
 	import { Moon, Sun } from "radix-icons-svelte";
-	import { theme } from "$lib/stores/store";
+	import { theme } from "$lib/stores/theme";
 
 	let darkMode = $theme === "dark";
 	function themeToggled() {
