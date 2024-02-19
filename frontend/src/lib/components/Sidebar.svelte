@@ -7,11 +7,11 @@
 		Home,
 		MagnifyingGlass,
 		Reader,
-		Tokens,
 	} from "radix-icons-svelte";
 	import * as Collapsible from "$lib/components/ui/collapsible";
-	import * as Dialog from "$lib/components/ui/dialog";
-	import Button from "./ui/button/button.svelte";
+	import ProjectsDialogue from "./ProjectsDialogue.svelte";
+	import type { CreateProjectFormSchema, ProjectListSchema } from "$lib/types/projects";
+	import type { SuperValidated } from "sveltekit-superforms";
 
 	const sidebarOptions = [
 		{
@@ -89,20 +89,8 @@
 		},
 	];
 
-	const projects = [
-		{
-			title: "Project 1",
-			href: "/",
-		},
-		{
-			title: "Project 2",
-			href: "/",
-		},
-		{
-			title: "Project 3",
-			href: "/",
-		},
-	];
+	export let projects: ProjectListSchema;
+	export let createProjectForm: SuperValidated<CreateProjectFormSchema>;
 
 	let transcriptDropdownOpen: boolean = false;
 	function onTranscriptDropdownOpenChange(state: boolean) {
@@ -117,36 +105,7 @@
 	class="px-3 md:flex-[0.22] md:px-2 border flex justify-between flex-col sticky z-10 top-0 left-0"
 >
 	<div class="flex flex-col flex-1 mt-3 min-h-0 overflow-y-auto">
-		<Dialog.Root>
-			<Dialog.Trigger
-				class="flex gap-[22px] mb-3 p-3 w-full items-center bg-primary hover:bg-primary/90 rounded-md shadow-sm hover:shadow-none shadow-primary/50 active:translate-y-[1px] active:translate-x-[1px] transition-all duration-300 ease-out"
-			>
-				{#if transcriptDropdownOpen}
-					<p class="md:inline-block text-lg font-medium text-primary-foreground">Project 1</p>
-				{:else}
-					<p class="hidden md:inline-block text-lg font-medium text-primary-foreground">
-						Project 1
-					</p>
-				{/if}
-				<Tokens class="ml-auto w-7 h-7 md:w-6 md:h-6 text-primary-foreground" />
-			</Dialog.Trigger>
-			<Dialog.Content class="gap-0">
-				<div class="text-xl font-medium mb-6">Select the project</div>
-				{#each projects as { title, href }}
-					<a
-						{href}
-						class="flex gap-[22px] p-3 w-full items-center hover:bg-secondary/55 border-b-2 transition-colors duration-300 ease-out"
-					>
-						<p class="text-lg capitalize ml-2">{title}</p>
-					</a>
-				{/each}
-				<Button
-					class="mt-8 bg-primary p-5 hover:bg-primary/90 shadow-sm hover:shadow-none shadow-primary/50 active:translate-y-[1px] active:translate-x-[1px] transition-all duration-300 ease-out"
-				>
-					<p class="text-lg font-medium text-primary-foreground">Create new project</p>
-				</Button>
-			</Dialog.Content>
-		</Dialog.Root>
+		<ProjectsDialogue {projects} {transcriptDropdownOpen} {createProjectForm} />
 		{#each sidebarOptions as { icon, title, href, contents }}
 			{#if contents.length > 0}
 				<Collapsible.Root

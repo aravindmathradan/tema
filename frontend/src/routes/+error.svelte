@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from "$app/stores";
-	import { Home } from "radix-icons-svelte";
 </script>
 
 <div class="flex items-center justify-center w-full h-full">
@@ -12,10 +11,10 @@
 			<p class="mt-4 mb-12 text-xl text-muted-foreground">We're investigating the issue.</p>
 		{/if}
 		<a
-			href="/"
+			href="/app"
 			class="font-medium text-xl text-accent underline underline-offset-4 hover:font-bold transition-all duration-300 ease-in-out"
 		>
-			Go Home
+			Go to app
 		</a>
 	</div>
 </div>
