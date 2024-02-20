@@ -22,8 +22,8 @@ type Project struct {
 }
 
 func ValidateProject(v *validator.Validator, project *Project) {
-	v.Check(validator.NotBlank(project.Name), "title", validator.EBLANKFIELD, "must be provided")
-	v.Check(validator.MaxChars(project.Name, 40), "title", validator.EMAXCHARS, "must not be more than 40 characters long")
+	v.Check(validator.NotBlank(project.Name), "name", validator.EBLANKFIELD, "must be provided")
+	v.Check(validator.MaxChars(project.Name, 40), "name", validator.EMAXCHARS, "must not be more than 40 characters long")
 
 	v.Check(validator.MaxBytes(project.Description, 500), "description", validator.EMAXCHARS, "must not be more than 500 bytes long")
 }
