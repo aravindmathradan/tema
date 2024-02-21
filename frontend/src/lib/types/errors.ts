@@ -15,3 +15,5 @@ export const errorSchema = z.object({
 export const errorResponseSchema = z.object({
 	error: errorSchema,
 });
+
+export type ErrorResponseSchema = z.infer<typeof errorResponseSchema>;
