@@ -13,6 +13,7 @@ var (
 type Models struct {
 	Permissions PermissionModel
 	Projects    ProjectModel
+	Transcripts TranscriptModel
 	Tokens      TokenModel
 	Users       UserModel
 }
@@ -21,6 +22,7 @@ func NewModels(db *sql.DB) Models {
 	return Models{
 		Permissions: PermissionModel{DB: db},
 		Projects:    ProjectModel{DB: db},
+		Transcripts: TranscriptModel{DB: db},
 		Tokens:      TokenModel{DB: db},
 		Users:       UserModel{DB: db},
 	}
